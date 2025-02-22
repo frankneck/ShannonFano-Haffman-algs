@@ -12,6 +12,7 @@ namespace ConsoleApp3
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Crypto.CreateCombinations();
+            
             Crypto.DoShannonFano();
             Crypto.DoHuffman();
 
