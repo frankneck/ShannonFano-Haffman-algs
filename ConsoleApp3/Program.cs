@@ -11,11 +11,12 @@ namespace ConsoleApp3
         static int Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Crypto.CreateCombinations();
             
-            Crypto.DoShannonFano();
-            Crypto.DoHuffman();
-
+            Crypto.CreateCombinations();
+            Crypto.DoTask1();
+        
+            // Console.Write($"Введите последовательность символов: ");
+            // Crypto.EncodeSequance();
             Console.ReadKey();
 
             return 0;

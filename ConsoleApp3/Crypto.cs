@@ -22,29 +22,22 @@ namespace ConsoleApp3
         // Порог вероятности для фильтрации
         static float probabilityThreshold = 0.01f;
 
-        public static void DoShannonFano()
+        public static void DoTask1()
+        {
+            DoShannonFano(sequencesWithProbabilities);
+            DoHuffman(sequencesWithProbabilities);
+        }
+
+        public static void DoShannonFano(List<(string sequence, float probability)> listWithProbabilities)
         {
             // Создаем список пар (последовательность, вероятность) и сортируем по убыванию вероятности
-            sequencesWithProbabilities =
-                gettingSequences.Zip(probabilityOfSequences, (s, p) => (s, p))
-                .OrderByDescending(pair => pair.Item2)
-                .ToList();
+            sequencesWithProbabilities = listWithProbabilities;
 
             // Запускаем рекурсивную функцию кодирования
             ShannonFanoRecursive(sequencesWithProbabilities, "");
 
-            // Вывод всех последовательностей и их кодов в консоль
-            Console.WriteLine("\nAll sequences and their Shannon-Fano codes:");
-            Console.WriteLine("-------------------------------------------------");
-            Console.WriteLine($"{"Sequence",-15}   |   {"Probability",10}   |   {"Code"}");
-            Console.WriteLine("-------------------------------------------------");
-
-            foreach (KeyValuePair<string, string> item in shannonFanoCodes)
-            {
-                Console.WriteLine($"{item.Key,-15}   |   {Math.Round(probabilityOfSequences[gettingSequences.IndexOf(item.Key)], 5)}   |    {item.Value}");
-            }
-
-            Console.WriteLine("-------------------------------------------------");
+            // Print table
+            PrintTable(shannonFanoCodes, "ShannonFano");
         }
 
         private static void ShannonFanoRecursive(List<(string sequence, float probability)> sequences, string prefix)
@@ -87,42 +80,30 @@ namespace ConsoleApp3
             ShannonFanoRecursive(leftPart, prefix + "0");
             ShannonFanoRecursive(rightPart, prefix + "1");
         }
-
-        public static void DoHuffman()
+        
+        public static void DoHuffman(List<(string sequence, float probability)> listWithProbabilities)
         {
-            // Сортируем последовательности по вероятности
-            var sequencesWithProbabilitiesSorted = sequencesWithProbabilities
-                .OrderByDescending(pair => pair.probability)
-                .ToList();
+            // sort seq
+            listWithProbabilities = listWithProbabilities.OrderByDescending(pair => pair.probability).ToList();
 
-            // Создаем дерево Хаффмана
-            var huffmanTree = BuildHuffmanTree(sequencesWithProbabilitiesSorted);
+            // create the Haffman tree
+            var huffmanTree = BuildHuffmanTree(listWithProbabilities);
 
             // Кодируем с использованием дерева Хаффмана
             GenerateHuffmanCodes(huffmanTree, "");
 
-            // Вывод всех последовательностей и их кодов Хаффмана
-            Console.WriteLine("\nAll sequences and their Huffman codes:");
-            Console.WriteLine("-------------------------------------------------");
-            Console.WriteLine($"{"Sequence",-15}   |   {"Probability",10}   |   {"Code"}");
-            Console.WriteLine("-------------------------------------------------");
-
-            foreach (KeyValuePair<string, string> item in huffmanCodes)
-            {
-                Console.WriteLine($"{item.Key,-15}   |   {Math.Round(probabilityOfSequences[gettingSequences.IndexOf(item.Key)], 5)}   |    {item.Value}");
-            }
-
-            Console.WriteLine("-------------------------------------------------");
+            // Print table
+            PrintTable(huffmanCodes, "Huffman");
         }
-
+        
         private static HuffmanNode BuildHuffmanTree(List<(string sequence, float probability)> sequences)
         {
-            var nodes = sequences.Select(pair => new HuffmanNode(pair.sequence, pair.probability)).ToList();
+            var nodes = sequences.Select(pair => new HuffmanNode(pair.sequence, pair.probability)).ToList(); // good
 
             while (nodes.Count > 1)
             {
                 nodes = nodes.OrderBy(node => node.Probability).ToList();
-
+                
                 var left = nodes[0];
                 var right = nodes[1];
                 nodes.RemoveRange(0, 2);
@@ -138,7 +119,7 @@ namespace ConsoleApp3
 
             return nodes.First();
         }
-
+        // recuirsive
         private static void GenerateHuffmanCodes(HuffmanNode node, string prefix)
         {
             if (node.Left == null && node.Right == null)
@@ -148,7 +129,7 @@ namespace ConsoleApp3
             }
 
             if (node.Left != null)
-                GenerateHuffmanCodes(node.Left, prefix + "0");
+                GenerateHuffmanCodes( node.Left, prefix + "0");
 
             if (node.Right != null)
                 GenerateHuffmanCodes(node.Right, prefix + "1");
@@ -156,23 +137,7 @@ namespace ConsoleApp3
 
         public static void CreateCombinations()
         {
-            // Ввод алфавита с проверкой
-            while (true)
-            {
-                Console.Write("Enter alphabet for your words: ");
-                charList = Console.ReadLine().Distinct().ToList();  // Считываем алфавит
-
-                n = charList.Count;
-
-                if (n == 0)
-                {
-                    Console.WriteLine("Alphabet cannot be empty! Please enter at least one character.");
-                }
-                else
-                {
-                    break;
-                }
-            }
+            ReadSequence();
 
             // Ввод длины слова с проверкой
             while (true)
@@ -249,6 +214,29 @@ namespace ConsoleApp3
 
                 probabilityOfSequences.Add(probabilityOfSequence);
             }
+
+            // Засунул сюда преобразование в список кортежей чтобы облегчить себе работу (была в DoShannon)
+            sequencesWithProbabilities = gettingSequences.Zip(probabilityOfSequences, (s, p) => (s, p)).OrderByDescending(pair => pair.Item2).ToList();
+        }
+
+        public static void ReadSequence()
+        {
+            charList.Clear();
+
+            while (true)
+            {
+                charList = Console.ReadLine().Distinct().ToList();
+                n = charList.Count;
+
+                if (n == 0)
+                {
+                    Console.WriteLine($"Error! Line mustn't be void. ");
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
 
         public static void GenerateCombination(string current, int depth)
@@ -265,7 +253,67 @@ namespace ConsoleApp3
             }
         }
 
-        // Класс для узлов дерева Хаффмана
+        public static void EncodeSequance()
+        {
+            Dictionary<string, int> pairs = new Dictionary<string, int>();
+            Dictionary<string, float> probabilities = new Dictionary<string, float>();
+            List<(string, float)> listWithProbabilities = new List<(string, float)>();
+
+            string str = Console.ReadLine();
+            List<char> matcherBox = str.Distinct().ToList();
+            float strLen = str.Length;
+
+            int count;
+
+            foreach (char matcher in matcherBox)
+            {
+                count = 0;
+
+                foreach (char c in str)
+                {
+                    if (matcher == c)
+                    {
+                        count++;
+                    }
+                }
+
+                pairs[matcher.ToString()] = count;
+            }
+
+            foreach (KeyValuePair<string, int> keyValuePair in pairs)
+            {
+                probabilities[keyValuePair.Key] = keyValuePair.Value / strLen;
+            }
+
+            listWithProbabilities = probabilities.Select(pair => (pair.Key, pair.Value)).ToList();
+
+            DoShannonFano(listWithProbabilities);
+            DoHuffman(listWithProbabilities);
+        }
+
+        static public void PrintTable(Dictionary<string, string> dic, string name)
+        {
+            // Вывод всех последовательностей и их кодов в консоль
+            Console.WriteLine($"\nAll sequences and their {name} codes:");
+            Console.WriteLine("-------------------------------------------------");
+            Console.WriteLine($"{"Sequence",-15}   |   {"Probability",10}   |   {"Code"}");
+            Console.WriteLine("-------------------------------------------------");
+
+            foreach (KeyValuePair<string, string> pair in shannonFanoCodes)
+            {
+                foreach (var item in sequencesWithProbabilities)
+                {
+                    if (pair.Key == item.sequence)
+                    {
+                        Console.WriteLine($"{pair.Key}  |  {item.probability}  |  {pair.Value}");
+                    }
+                }
+            }
+
+            Console.WriteLine("-------------------------------------------------");
+        } 
+
+        // Class for Haffman nodes
         class HuffmanNode
         {
             public string Sequence { get; set; }
@@ -281,3 +329,10 @@ namespace ConsoleApp3
         }
     }
 }
+
+
+// Hello, world!
+// 13 chars
+// посчитать сколько встречается каждый символ
+// вычислить вероятность для каждого символа
+// вычислить код для каждой буквы или пробела
