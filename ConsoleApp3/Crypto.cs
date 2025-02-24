@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using DocumentFormat.OpenXml.Packaging;         // для работы с доками с расширениями .docx, .xml, .pptx
+using DocumentFormat.OpenXml.Wordprocessing;    // для работы с текстом
 
 namespace ConsoleApp3
 {
@@ -18,6 +21,8 @@ namespace ConsoleApp3
         static Dictionary<char, float> dictionaryOfProbabilities = new Dictionary<char, float>();
         static Dictionary<string, string> shannonFanoCodes = new Dictionary<string, string>();
         static Dictionary<string, string> huffmanCodes = new Dictionary<string, string>();
+
+        
 
         // Порог вероятности для фильтрации
         static float probabilityThreshold = 0.01f;
@@ -37,7 +42,7 @@ namespace ConsoleApp3
             ShannonFanoRecursive(sequencesWithProbabilities, "");
 
             // Print table
-            PrintTable(shannonFanoCodes, "ShannonFano");
+            PrintTable(shannonFanoCodes, "Shannon-Fano");
         }
 
         private static void ShannonFanoRecursive(List<(string sequence, float probability)> sequences, string prefix)
@@ -55,9 +60,12 @@ namespace ConsoleApp3
 
             float totalProbability = sequences.Sum(pair => pair.probability);
 
-            if (totalProbability < probabilityThreshold || sequences.Count == 1)
+            if (totalProbability < probabilityThreshold)
             {
-                shannonFanoCodes[sequences[0].sequence] = prefix;
+                foreach (var seq in sequences)
+                {
+                    shannonFanoCodes[seq.sequence] = prefix;
+                }
                 return;
             }
 
@@ -74,13 +82,30 @@ namespace ConsoleApp3
                 }
             }
 
+            // Защита от пустых частей разбиения
+            if (splitIndex == 0 || splitIndex >= sequences.Count)
+            {
+                splitIndex = sequences.Count / 2; // Если разбиение не работает, делим список пополам
+            }
+
             var leftPart = sequences.Take(splitIndex).ToList();
             var rightPart = sequences.Skip(splitIndex).ToList();
 
-            ShannonFanoRecursive(leftPart, prefix + "0");
-            ShannonFanoRecursive(rightPart, prefix + "1");
+            // Проверяем, чтобы обе части не были пустыми
+            if (leftPart.Count > 0 && rightPart.Count > 0)
+            {
+                ShannonFanoRecursive(leftPart, prefix + "0");
+                ShannonFanoRecursive(rightPart, prefix + "1");
+            }
+            else
+            {
+                foreach (var seq in sequences)
+                {
+                    shannonFanoCodes[seq.sequence] = prefix;
+                }
+            }
         }
-        
+
         public static void DoHuffman(List<(string sequence, float probability)> listWithProbabilities)
         {
             // sort seq
@@ -253,13 +278,12 @@ namespace ConsoleApp3
             }
         }
 
-        public static void EncodeSequance()
+        public static void EncdoeSequTask2(string str)
         {
             Dictionary<string, int> pairs = new Dictionary<string, int>();
             Dictionary<string, float> probabilities = new Dictionary<string, float>();
             List<(string, float)> listWithProbabilities = new List<(string, float)>();
 
-            string str = Console.ReadLine();
             List<char> matcherBox = str.Distinct().ToList();
             float strLen = str.Length;
 
@@ -291,27 +315,91 @@ namespace ConsoleApp3
             DoHuffman(listWithProbabilities);
         }
 
+        public static void EncdoeSequTask2(string str, List<string> wordsToEncode)
+        {
+            // Словарь для хранения частоты встречаемости слов
+            Dictionary<string, int> pairs = new Dictionary<string, int>();
+            Dictionary<string, float> probabilities = new Dictionary<string, float>();
+            List<(string, float)> listWithProbabilities = new List<(string, float)>();
+
+            // Рассчитываем вероятность для каждого из слов из wordsToEncode
+            float strLen = str.Length;
+
+            // Подсчитываем количество каждого слова из списка в строке
+            foreach (string word in wordsToEncode)
+            {
+                int count = 0;
+
+                for (int i = 0; i <= str.Length - word.Length; i++)
+                {
+                    if (str.Substring(i, word.Length) == word)
+                    {
+                        count++;
+                    }
+                }
+
+                if (count > 0)
+                {
+                    pairs[word] = count;
+                }
+            }
+
+            // Рассчитываем вероятности
+            foreach (KeyValuePair<string, int> keyValuePair in pairs)
+            {
+                probabilities[keyValuePair.Key] = (float)keyValuePair.Value / strLen;
+            }
+
+            // Заполняем список вероятностей
+            listWithProbabilities = probabilities.Select(pair => (pair.Key, pair.Value)).ToList();
+
+            // Вызываем методы кодирования (Shannon-Fano и Huffman)
+            DoShannonFano(listWithProbabilities);
+            DoHuffman(listWithProbabilities);
+        }
+
         static public void PrintTable(Dictionary<string, string> dic, string name)
         {
             // Вывод всех последовательностей и их кодов в консоль
-            Console.WriteLine($"\nAll sequences and their {name} codes:");
-            Console.WriteLine("-------------------------------------------------");
-            Console.WriteLine($"{"Sequence",-15}   |   {"Probability",10}   |   {"Code"}");
-            Console.WriteLine("-------------------------------------------------");
+            Console.WriteLine($"\n{name} codes");
+            Console.WriteLine("{0,-15} {1,-15} {2,-15}", "Sequence", "Probability", "Code");
+            Console.WriteLine(new string('-', 45));  // Для разделителя
 
-            foreach (KeyValuePair<string, string> pair in shannonFanoCodes)
+            foreach (KeyValuePair<string, string> pair in dic)
             {
                 foreach (var item in sequencesWithProbabilities)
                 {
                     if (pair.Key == item.sequence)
                     {
-                        Console.WriteLine($"{pair.Key}  |  {item.probability}  |  {pair.Value}");
+                        Console.WriteLine("{0,-15} {1,-15:F4} {2,-15}", pair.Key, item.probability, pair.Value);
                     }
                 }
             }
+        }
 
-            Console.WriteLine("-------------------------------------------------");
-        } 
+        static public void FindInDocumentTask3(string path)
+        {
+            string text = null;
+
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(path, false)) // temperary block that will be cleared in memory
+            {
+                // Получаем основной текстовый документ (main part in doc)
+                var body = doc.MainDocumentPart.Document.Body;
+                
+                // Проходим по всем абзацам и выводим текст
+                foreach (var paragraph in body.Elements<Paragraph>()) // body.Elements<Paragraph> return all paragraphs in our text
+                {
+                    if (text != null)
+                        text += "\n\t" + paragraph.InnerText; // print inner text
+                    else
+                        text = paragraph.InnerText;
+                }
+            }
+
+            List<string> wordsList = new List<string>{ "th", "tion", "ing", "ed", "re", "are", "is", "an", "the", "to" };
+
+            EncdoeSequTask2(text, wordsList);
+        }
 
         // Class for Haffman nodes
         class HuffmanNode

@@ -1,8 +1,19 @@
 {
   "version": 2,
-  "dgSpecHash": "h3O3qAKs7mo=",
+  "dgSpecHash": "QF45RhHHULQ=",
   "success": true,
   "projectFilePath": "C:\\Users\\finnf\\Documents\\Learning_DVFU\\6 sem\\Crypto\\ShannonFano-Haffman-algs\\ConsoleApp3\\ConsoleApp3.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\finnf\\.nuget\\packages\\documentformat.openxml\\3.2.0\\documentformat.openxml.3.2.0.nupkg.sha512",
+    "C:\\Users\\finnf\\.nuget\\packages\\documentformat.openxml.framework\\3.2.0\\documentformat.openxml.framework.3.2.0.nupkg.sha512",
+    "C:\\Users\\finnf\\.nuget\\packages\\skiasharp\\2.88.8\\skiasharp.2.88.8.nupkg.sha512",
+    "C:\\Users\\finnf\\.nuget\\packages\\skiasharp.nativeassets.macos\\2.88.8\\skiasharp.nativeassets.macos.2.88.8.nupkg.sha512",
+    "C:\\Users\\finnf\\.nuget\\packages\\skiasharp.nativeassets.win32\\2.88.8\\skiasharp.nativeassets.win32.2.88.8.nupkg.sha512",
+    "C:\\Users\\finnf\\.nuget\\packages\\system.io.packaging\\8.0.1\\system.io.packaging.8.0.1.nupkg.sha512",
+    "C:\\Users\\finnf\\.nuget\\packages\\xceed.document.net\\4.0.25103.5784\\xceed.document.net.4.0.25103.5784.nupkg.sha512",
+    "C:\\Users\\finnf\\.nuget\\packages\\xceed.drawing.net\\1.0.25103.5784\\xceed.drawing.net.1.0.25103.5784.nupkg.sha512",
+    "C:\\Users\\finnf\\.nuget\\packages\\xceed.pdf\\4.0.25103.5784\\xceed.pdf.4.0.25103.5784.nupkg.sha512",
+    "C:\\Users\\finnf\\.nuget\\packages\\xceed.words.net\\4.0.25103.5784\\xceed.words.net.4.0.25103.5784.nupkg.sha512"
+  ],
   "logs": []
 }
