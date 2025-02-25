@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "QF45RhHHULQ=",
+  "dgSpecHash": "0oAYyUgbkE8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\finnf\\Documents\\Learning_DVFU\\6 sem\\Crypto\\ShannonFano-Haffman-algs\\ConsoleApp3\\ConsoleApp3.csproj",
+  "projectFilePath": "C:\\Users\\finnf\\Documents\\Learning_DVFU\\3 course\\Crypto\\ShannonFano-Haffman-algs\\ConsoleApp3\\ConsoleApp3.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\finnf\\.nuget\\packages\\documentformat.openxml\\3.2.0\\documentformat.openxml.3.2.0.nupkg.sha512",
     "C:\\Users\\finnf\\.nuget\\packages\\documentformat.openxml.framework\\3.2.0\\documentformat.openxml.framework.3.2.0.nupkg.sha512",

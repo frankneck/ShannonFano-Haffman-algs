@@ -11,21 +11,21 @@ namespace ConsoleApp3
 {
     class Program
     {
-        const string filePath = "C:\\Users\\finnf\\Documents\\Learning_DVFU\\6 sem\\Crypto\\teskt_dlya_3_zadachi.docx";
+        const string filePath = "teskt_dlya_3_zadachi.docx";
         static int Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             
             // Task 1
-            Console.Write($"Введите алфавит: ");
-            Crypto.CreateCombinations();
-            Crypto.DoTask1();
+            // Console.Write($"Введите алфавит: ");
+            // Crypto.CreateCombinations();
+            // Crypto.DoTask1();
         
-            // Task 2
-            Console.Write($"Введите последовательность символов: ");
-            string str = Console.ReadLine();
-            Crypto.EncdoeSequTask2(str);
-            Console.ReadKey();
+            // // Task 2
+            // Console.Write($"Введите последовательность символов: ");
+            // string str = Console.ReadLine();
+            // Crypto.EncdoeSequTask2(str);
+            // Console.ReadKey();
 
             // Task 3
             Crypto.FindInDocumentTask3(filePath);
